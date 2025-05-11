@@ -1,34 +1,39 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SecureStorage.CQRS.Queries;
+using SecureStorage.Models;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 
-namespace SecureStorage.Controllers
+namespace SecureStorage.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+
+public class PatientController(IMediator mediator) : Controller
 {
-    [ApiController]
-    [Route("patient")]
-    public class PatientController(IMediator mediator) : Controller
+    private readonly IMediator _mediator = mediator;
+
+    [HttpGet]
+    public async Task<IActionResult> GetPatients()
     {
-        private readonly IMediator _mediator = mediator;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        [HttpGet]
-        public async Task<IActionResult> GetPatients(string userId)
+        if (string.IsNullOrEmpty(userId))
         {
-            if (string.IsNullOrEmpty(userId))
-            {
-                return BadRequest(new { Message = "userId is required." });
-            }
+            return Unauthorized();
+        }
 
-            try
-            {
-                var query = new GetPatientsQuery(userId);
-                var patients = await _mediator.Send(query);
+        try
+        {
+            var query = new GetPatientsQuery(userId);
+            var patients = await _mediator.Send(query);
 
-                return Ok(new { UserId = userId, Patients = patients });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = $"Error retrieving patients: {ex.Message}" });
-            }
+            return Ok(new { Patients = patients.OrderBy(q => q).ToList() });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = $"Error retrieving patients: {ex.Message}" });
         }
     }
 
