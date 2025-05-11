@@ -1,0 +1,6 @@
+services:
+  securestorage:
+    image: ${DOCKER_REGISTRY-}securestorage
+    build:
+      context: .
+      dockerfile: SecureStorage/Dockerfile
