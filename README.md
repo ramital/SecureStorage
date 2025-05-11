@@ -127,7 +127,7 @@ graph TD
 * Access propagation (`member -> owner -> can_read`) simplifies delegation
 * Easily support custom roles like `nurse`, `admin`, `researcher`
 
-**Example:**
+**DSL Model:**
 
 ```dsl
 model
@@ -148,7 +148,7 @@ type patient
 
 ### 2. **Group-Based Category Control**
 
-Dynamic role (admin, doctor, nurse, ...) gets access only to relevant PHI categories:
+Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categories:
 
 | Role       | Categories Accessed               |
 | ---------- | --------------------------------- |
