@@ -11,7 +11,7 @@ This project delivers a **cloud-native, zero-trust** architecture to protect PHI
 * **AES-256 encryption** for data confidentiality
 * **Azure Blob Storage** for scalable encrypted data storage
 * **Azure Key Vault** for secure key management
-* **OpenFGA** for dynamic role-based access control
+* **OpenFGA** for dynamic role-based access control (backed by PostgreSQL) 
 * **Dockerized microservice** deployment for simplicity and reproducibility
 
 ---
@@ -89,7 +89,7 @@ sequenceDiagram
 
 * Replaces Monolithic RBAC: Leverages OpenFGA for dynamic, fine‑grained policies. Centralized role definitions (e.g., Admin: full access; Nurse: Identifiers & MedicalRecords) enable flexible, scalable access across systems.
 
-* Promotes Secure Interoperability: Exposes RESTful endpoints (POST /phi, GET /patient, PUT /phi, DELETE /phi) for seamless EHR and tele‑audiology integration, preserving encryption and access controls.
+* Promotes Secure Interoperability: Exposes RESTful endpoints  for seamless EHR and tele‑audiology integration, preserving encryption and access controls.
 
 * Enforces Separation of Duties: Encryption keys reside solely in Key Vault and require both token‑based authentication and OpenFGA approval—developers and unauthorized services cannot decrypt PHI.
 
@@ -148,7 +148,7 @@ type patient
 
 ### 2. **Group-Based Category Control**
 
-Each role (doctor, nurse, admin) gets access only to relevant PHI categories:
+Dynamic role (admin, doctor, nurse, ...) gets access only to relevant PHI categories:
 
 | Role       | Categories Accessed               |
 | ---------- | --------------------------------- |
@@ -219,7 +219,6 @@ Update `appsettings.json` with:
 
 ## 🌐 Future Plans
 
-* 🔒 Immutable audit logging (Azure Confidential Ledger)
 * ⛓ Patient Consent ledger (blockchain-backed)
 * 🔐 Key rotation & HMAC integrity checks
 * 🛡️ MFA integration for providers
