@@ -2,6 +2,13 @@
 
 A robust .NET Core-based API for securely storing and retrieving Protected Health Information (PHI), leveraging Azure services and modern authorization models for healthcare providers. Designed with HIPAA compliance, high security, and granular access control in mind, this solution uses AES-256 encryption to protect PHI, Azure Blob Storage for scalable data storage, and Azure Key Vault for secure key management. OpenFGA ensures fine-grained, role-based access control (e.g., Admin, Doctor, Nurse), while JWT token-based authentication enables secure, stateless authorization. The API supports RESTful operations for seamless integration with EHR systems. Deployable via Docker for consistent, portable environments, it’s built with C#, .NET 8, and integrates with Azure Identity for authentication, and Swagger for testing. My mission is to advance healthcare technology by delivering scalable, secure, and compliant solutions that reduce data breach risks.
 
+
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/975f03df-c3d9-4fbb-8d92-ba9b96ee1cfc"
+       alt="diagram"
+       width="450" />
+</p>
+
 ---
 
 ## 🚀 Overview
