@@ -21,18 +21,18 @@ This project delivers a **cloud-native, zero-trust** architecture to protect PHI
 ```mermaid
 graph TD
     %% Login Flow
-    A[Client] -->|POST /token/login| B[Token Service]
+    A[Client] -->|POST /auth/login| B[Token Service]
     B -->|Validate Credentials| C[Users: Alice-Admin Bob-Nurse Joe-Doctor]
     C -->|Generate| D[JWT Token]
 
     %% RESTful PHI Operations
-    A -->|POST /phi Create| E[.NET Core API]
+    A -->|POST /phi| E[.NET Core API]
     E --> F[Generate AES-256 Key]
     F --> G[Encrypt PHI with Key]
     G --> H[Store Encrypted PHI in Azure Blob Storage]
     F --> I[Store AES Key in Azure Key Vault]
 
-    A -->|GET /patient Retrieve| J[.NET Core API]
+    A -->|GET /patient | J[.NET Core API]
     J --> K[Validate JWT Token]
     K --> L[OpenFGA Policy Check]
     L -->|Authorize Role: e.g. Admin| M[Retrieve AES Key from Key Vault]
@@ -40,8 +40,8 @@ graph TD
     N --> O[Decrypt PHI with Key]
     O --> P[Return Decrypted PHI to Client]
 
-    A -->|PUT /phi Update| E
-    A -->|DELETE /phi Delete| E
+    A -->|PUT /phi | E
+    A -->|DELETE /phi | E
 ```
 
 ## 🏛 Sequence Diagram
@@ -152,9 +152,9 @@ Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categ
 
 | Role       | Categories Accessed               |
 | ---------- | --------------------------------- |
-| Admin      | All categories incl. Insurance    |
+| Admin      | All categories                    |
 | Nurse      | Identifiers, Medical Records      |
-| Doctor     | Medical Records + Biometrics      |
+| Doctor     | Identifiers, Medical Records , Biometrics      |
 
 
 ---
@@ -192,7 +192,8 @@ Update `appsettings.json` with:
 
 ## 🔹 Azure Blob Storage Example
 
-![image](https://github.com/user-attachments/assets/ad74b2f7-33b3-4e22-b2ad-6d127b3ce0f5)
+![442527209-ad74b2f7-33b3-4e22-b2ad-6d127b3ce0f5](https://github.com/user-attachments/assets/017a0797-b3a7-47b0-9042-521374be67fa)
+
 
 ## 🔹 Azure Key Vault Secrets
 
