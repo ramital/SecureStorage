@@ -1,13 +1,17 @@
 # Healthcare PHI Secure Storage Service
 
-A robust .NET Core-based API for securely storing and retrieving Protected Health Information (PHI), leveraging Azure services and modern authorization models for healthcare providers. Designed with HIPAA compliance, high security, and granular access control in mind, this solution uses AES-256 encryption to protect PHI, Azure Blob Storage for scalable data storage, and Azure Key Vault for secure key management. OpenFGA ensures fine-grained, role-based access control (e.g., Admin, Doctor, Nurse), while JWT token-based authentication enables secure, stateless authorization. The API supports RESTful operations for seamless integration with EHR systems. Deployable via Docker for consistent, portable environments, it’s built with C#, .NET 8, and integrates with Azure Identity for authentication, and Swagger for testing. My mission is to advance healthcare technology by delivering scalable, secure, and compliant solutions that reduce data breach risks.
+I designed and implemented a robust .NET Core-based API to securely store and retrieve Protected Health Information (PHI) for healthcare providers, leveraging Azure services and modern authorization models. Built to ensure HIPAA compliance, high security, and granular access control, this solution uses AES-256 encryption to protect PHI, Azure Blob Storage for scalable data storage, and Azure Key Vault for secure key management. I integrated OpenFGA for fine-grained, role-based access control (e.g., Admin, Doctor, Nurse) and implemented JWT token-based authentication for secure, stateless authorization. The API supports RESTful operations for seamless integration with EHR systems and is deployable via Docker for consistent, portable environments. Developed using C#, .NET 8, Azure Identity for authentication, and Swagger for API testing, this project reflects my expertise gained as a Senior Software Engineer in the healthcare sector, where I developed secure  platforms for 1M+ patients. My goal is to reduce the $10B annual U.S. healthcare data breach cost (Ponemon Institute, 2023) by delivering a scalable, secure, and compliant solution, enhancing patient trust and access to care, particularly in underserved regions.
+ 
 
 
-<p align="left">
-  <img src="https://github.com/user-attachments/assets/975f03df-c3d9-4fbb-8d92-ba9b96ee1cfc"
-       alt="diagram"
-       width="450" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d2a69278-69f6-4d9b-bec4-55e02a7ce9c3"
+       width="400" />
 </p>
+
+
+
+the "Healthcare PHI Secure Storage Service" can evolve into a third-party Data Protection-as-a-Service, enabling healthcare organizations to securely store and access PHI via token-based control. Data will be encrypted with AES-256 using multiple responsibility-spread keys, requiring all parties (e.g., authentication, storage, and key management teams) to collaborate for decryption, ensuring no single entity can access the data. Keys will be stored in Azure Key Vault under departmental oversight, while encrypted blobs in Azure Blob Storage will be managed by a separate team, enforcing strict separation of duties. Only authorized users, validated via tokens and OpenFGA policies, can access specific data, enhancing security and compliance for healthcare providers.
 
 ---
 
@@ -30,18 +34,18 @@ graph TD
     %% Login Flow
     A[Client] -->|POST /auth/login| B[Token Service]
     B -->|Validate Credentials| C[Users: Alice-Admin Bob-Nurse Joe-Doctor]
-    C -->|Generate| D[JWT Token]
+    C -->|Generate| D[Token]
 
     %% RESTful PHI Operations
-    A -->|POST /phi| E[.NET Core API]
+    A -->|POST /phi| E[Validate  Token]
     E --> F[Generate AES-256 Key]
     F --> G[Encrypt PHI with Key]
     G --> H[Store Encrypted PHI in Azure Blob Storage]
     F --> I[Store AES Key in Azure Key Vault]
 
-    A -->|GET /patient | J[.NET Core API]
-    J --> K[Validate JWT Token]
-    K --> L[OpenFGA Policy Check]
+    A -->|GET /patient | J[Validate  Token]
+  
+    J --> L[OpenFGA Policy Check]
     L -->|Authorize Role: e.g. Admin| M[Retrieve AES Key from Key Vault]
     M --> N[Retrieve Encrypted PHI from Blob Storage]
     N --> O[Decrypt PHI with Key]
@@ -62,21 +66,20 @@ sequenceDiagram
     participant BS as Azure Blob Storage
 
     %% Login and Token Generation
-    C->>TS: POST /auth/login (username: "alice", password: "test")
-    TS->>TS: Validate credentials (GUID: 88faa0d2-aefc-49c9-b651-f59d58e54384)
-    TS-->>C: JWT Token (Role: Admin)
+    C->>TS: POST /auth/login 
+    TS->>TS: Validate credentials 
+    TS-->>C: Token
 
     %% Store PHI Data (Anonymous Access)
     C->>API: POST /phi (PatientId: GUID, Data: Identifiers)
     API->>API: Generate AES-256 Key (256-bit)
     API->>API: Encrypt Data (CBC, PKCS7, IV)
-    API->>BS: Store Encrypted PHI (blob: Encrypted json)
     API->>KV: Store AES Key 
-    API-->>C: BlobName: json
+    API->>BS: Store Encrypted PHI (blob: Encrypted json)
 
     %% Get Patient list (Authorized Access)
     C->>API: GET /patient 
-    API->>API: Validate JWT Token (Extract Role: Admin)
+    API->>API: Validate Token (Extract Role: Admin)
     API->>OFGA: Check Access (user: alice, patient: key, relation: can_read)
     OFGA->>OFGA: Evaluate Policy (group: Role.Admin, owner, can_read:key)
     OFGA-->>API: Access Granted (Categories: Identifiers, MedicalRecords, ...)
@@ -87,6 +90,33 @@ sequenceDiagram
     API->>API: Decrypt PHI (CBC, PKCS7, IV)
     API-->>C: Decrypted PHI (Identifiers: {"fullName": "John Doe", ...})
 ```
+
+## 🏛 Simplified Data Storage Example 
+```mermaid
+graph TD
+    %% Data Storage Structure
+    A[Azure Blob Storage] -->|PatientId: 123| B[Category: Identifiers]
+    B --> C[Encrypted Blob: 123_Identifiers_timestamp.json]
+    C --> D[Fields: fullName: John Doe, dob: 1985-04-12, ssn: 123-45-6789, mrn: MRN00123]
+
+    A -->|PatientId: 123| E[Category: MedicalRecords]
+    E --> F[Encrypted Blob: 123_MedicalRecords_timestamp.json]
+    F --> G[Fields: diagnosis: Type 2 Diabetes, medications: Metformin, allergies: Penicillin, labResult: A1C 7.5%]
+
+    %% Key Storage
+    H[Azure Key Vault] -->|PatientId: 123| I[Key: key-123-Identifiers]
+    H -->|PatientId: 123| J[Key: key-123-MedicalRecords]
+
+    %% OpenFGA
+    K[Role-Based Access via OpenFGA] -->|can_read| L[Groups]
+    L --> M[Role: Admin Access: Identifiers MedicalRecords FinancialInfo ContactInfo InsuranceInfo BiometricData]
+    L --> N[Role: Doctor Access: Identifiers MedicalRecords ContactInfo BiometricData]
+    L --> O[Role: Nurse Access: Identifiers MedicalRecords ContactInfo]
+```
+<p>This diagram provides a simplified example of PHI data storage for PatientId: 123, organized by categories (e.g., Identifiers, MedicalRecords) in Azure Blob Storage, with AES-256 encryption keys managed in Azure Key Vault. It also illustrates the OpenFGA role-based access model, defining permissions for roles like Admin, Doctor, and Nurse across data categories.
+</p>
+
+
 ---
 ## 🏥 What It Solves
 
@@ -243,4 +273,7 @@ Update `appsettings.json` with:
 
 MIT. LICENSE.
 
-> **Note**: This is a PoC and should undergo full security audits before production use.
+## ℹ️  Proof-of-Concept (PoC) Code
+This repository contains the PoC implementation of the Healthcare PHI Secure Storage Service, developed by Ahmad Rami El Tal.
+
+
