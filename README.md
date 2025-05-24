@@ -147,6 +147,8 @@ graph TD
 | Azure Key Vault    | Centralized key lifecycle  | Limits exposure of secrets           |
 | OpenFGA RBAC       | Granular, dynamic policies | Enforces minimum necessary use       |
 | Docker & Swagger   | Easy to deploy/test        | Reduces complexity & improves DevOps |
+| Keycloak           | User Authentication        | Built-in user federation             |
+
 
 ---
 
@@ -211,21 +213,26 @@ Includes:
 * SecureStorage API (C#)
 * OpenFGA (authz)
 * PostgreSQL (for FGA)
+* Keycloak (OIDC Provider)
 
 Update `appsettings.json` with:
 
 ```json
-{
+"Azure":{
   "AzureBlobConnectionString": "...",
   "KeyVaultUrl": "..."
 }
+"Keycloak": {
+  "ClientId": "...",
+  "ClientSecret": "..."
+  }
 ```
 
 ---
 
 ## 🔹 Swagger 
 
-![image](https://github.com/user-attachments/assets/a5a450eb-ad99-484d-b7fd-4335706a7537)
+![image](https://github.com/user-attachments/assets/0e29d367-bac9-4a64-80a9-c3309240b11f)
 
 
 ## 🔹 Azure Blob Storage Example
@@ -236,6 +243,10 @@ Update `appsettings.json` with:
 ## 🔹 Azure Key Vault Secrets
 
 ![image](https://github.com/user-attachments/assets/99f5fd4d-26ed-4aa5-9e6b-923b8c702497)
+
+## 🔹 Keycloak (OIDC Provider) 
+
+![image](https://github.com/user-attachments/assets/20679da2-56eb-4105-b2c2-79c3deeda4bd)
 
 
 ## 🔹 OpenFGA Visualization
@@ -257,7 +268,8 @@ Update `appsettings.json` with:
 ---
 
 ## 🌐 Future Plans
-
+* 👩‍💻 UI for full third-party healthcare service integration  
+* ⚙️ Saga-driven orchestration of Key Vault and Blob operations for zero-trust resilience.
 * ⛓ Patient Consent ledger (blockchain-backed)
 * 🔐 Key rotation & HMAC integrity checks
 * 🛡️ MFA integration for providers
