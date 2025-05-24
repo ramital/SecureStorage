@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SecureStorage.CQRS.Queries;
 using SecureStorage.Models;
@@ -9,7 +10,7 @@ namespace SecureStorage.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-
+[Authorize]
 public class PatientController(IMediator mediator) : Controller
 {
     private readonly IMediator _mediator = mediator;
@@ -17,19 +18,16 @@ public class PatientController(IMediator mediator) : Controller
     [HttpGet]
     public async Task<IActionResult> GetPatients()
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
+        var userId = User.FindFirst("guid")?.Value;
         if (string.IsNullOrEmpty(userId))
-        {
             return Unauthorized();
-        }
 
         try
         {
             var query = new GetPatientsQuery(userId);
             var patients = await _mediator.Send(query);
 
-            return Ok(new { Patients = patients.OrderBy(q => q).ToList() });
+            return Ok(new {  Patients = patients.OrderBy(q => q).ToList() });
         }
         catch (Exception ex)
         {

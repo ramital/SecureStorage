@@ -1,0 +1,46 @@
+﻿{
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "guid": [ "88faa0d2-aefc-49c9-b651-f59d58e54384" ]
+      }
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "guid": [ "b570c3bb-6825-4b88-81d9-8989426fe41e" ]
+      }
+    },
+    {
+      "username": "joe",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "guid": [ "3a53bd1d-4876-4867-9c68-9c9239963107" ]
+      }
+    }
+  ]
+}

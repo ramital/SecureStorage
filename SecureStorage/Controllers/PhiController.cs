@@ -5,9 +5,10 @@ using SecureStorage.Services;
 
 namespace SecureStorage.Controllers;
 
-[AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
+
 public class PhiController : ControllerBase
 {
     private readonly IPhiService _phiService;
@@ -27,16 +28,7 @@ public class PhiController : ControllerBase
         return result.IsSuccess ? Ok(new { Message = result.Message }) : BadRequest(new { result.Message });
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Get(string patientKey)
-    {
-        if (string.IsNullOrEmpty(patientKey))
-            return BadRequest(new { Message = "PatientKey is required." });
-
-        var result = await _phiService.RetrievePhiDataAsync(patientKey);
-        return result.IsSuccess ? Ok(new { Data = result.Data }) : BadRequest(new { result.Message });
-    }
-
+ 
     [HttpPut]
     public async Task<IActionResult> Put([FromBody] PhiData phiData)
     {

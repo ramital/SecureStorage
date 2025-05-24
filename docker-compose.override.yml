@@ -5,10 +5,12 @@ services:
     environment:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_ENVIRONMENT=Development
+      - Keycloak__Authority=http://keycloak:8080/realms/securestorage
     volumes:
       - ${USERPROFILE}\.aspnet\https:/https:ro
     depends_on:
       - openfga
+      - keycloak  
     networks:
       - openfga-network
 
@@ -55,9 +57,32 @@ services:
     networks:
       - openfga-network
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: keycloak
+    command: start-dev --db=postgres --hostname-strict=false 
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=secret
+      - KC_DB=postgres
+      - KC_DB_URL_HOST=postgres
+      - KC_DB_URL_PORT=5432
+      - KC_DB_URL_DATABASE=keycloak
+      - KC_DB_USERNAME=openfga
+      - KC_DB_PASSWORD=openfga
+      - QUARKUS_TRANSACTION_MANAGER_ENABLE_RECOVERY=true
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres
+    networks:
+      - openfga-network
+    volumes:
+      - keycloak_data:/opt/keycloak/data
 networks:
   openfga-network:
     driver: bridge
 
 volumes:
   openfga_pg_data:
+  keycloak_data:
