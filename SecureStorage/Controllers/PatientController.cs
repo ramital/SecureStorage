@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SecureStorage.CQRS.Queries;
-using SecureStorage.Models;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
 
 namespace SecureStorage.Controllers;
 
@@ -34,5 +31,4 @@ public class PatientController(IMediator mediator) : Controller
             return StatusCode(500, new { Message = $"Error retrieving patients: {ex.Message}" });
         }
     }
-
 }

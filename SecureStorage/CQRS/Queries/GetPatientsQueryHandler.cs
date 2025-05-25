@@ -1,9 +1,7 @@
 ﻿using MediatR;
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
-using SecureStorage.Models;
 using SecureStorage.Services;
-using System.Linq;
 
 namespace SecureStorage.CQRS.Queries;
 

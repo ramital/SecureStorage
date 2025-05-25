@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using SecureStorage.Models;
 using SecureStorage.Services;
 
+namespace SecureStorage.Controllers;
+
 [AllowAnonymous]
 [Route("api/[controller]")]
 [ApiController]

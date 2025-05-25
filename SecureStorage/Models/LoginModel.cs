@@ -1,8 +1,16 @@
-﻿namespace SecureStorage.Models
+﻿namespace SecureStorage.Models;
+
+/// <summary>
+/// Represents the login credentials for a user.
+/// </summary>
+public class LoginModel
 {
-    public class LoginModel
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the username for the user.
+    /// </summary>
+    public string Username { get; set; }
+    /// <summary>
+    /// Gets or sets the password for the user.
+    /// </summary>
+    public string Password { get; set; }
 }

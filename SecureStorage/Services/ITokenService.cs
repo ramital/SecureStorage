@@ -1,7 +1,6 @@
-﻿namespace SecureStorage.Services
+﻿namespace SecureStorage.Services;
+
+public interface ITokenService
 {
-    public interface ITokenService
-    {
-        Task<string?> GenerateTokenAsync(string username, string password);
-    }
+    Task<string?> GenerateTokenAsync(string username, string password);
 }

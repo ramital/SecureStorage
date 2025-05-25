@@ -7,178 +7,171 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace SecureStorage.Services
+namespace SecureStorage.Services;
+
+public class PhiService : IPhiService
 {
-    public class PhiService : IPhiService
+    private readonly BlobServiceClient _blobServiceClient;
+    private readonly SecretClient _secretClient;
+    private readonly string _containerName = "encrypteddb";
+
+    public PhiService(BlobServiceClient blobServiceClient, SecretClient secretClient)
     {
-        private readonly BlobServiceClient _blobServiceClient;
-        private readonly SecretClient _secretClient;
-        private readonly string _containerName = "encrypteddb";
+        _blobServiceClient = blobServiceClient;
+        _secretClient = secretClient;
+    }
 
-        public PhiService(BlobServiceClient blobServiceClient, SecretClient secretClient)
+    public async Task<Result> StorePhiDataAsync(PhiData phiData)
+    {
+        try
         {
-            _blobServiceClient = blobServiceClient;
-            _secretClient = secretClient;
-        }
+            string keyName = $"{phiData.PatientKey}-{PatientDataCategoryExtensions.GetGuid((PatientDataCategory)phiData.Category)}";
+            if (await DoesKeyExistAsync($"key-{keyName}"))
+                return Result.Failure($"{keyName} already exists in Key Vault.");
 
-        public async Task<Result> StorePhiDataAsync(PhiData phiData)
+            // Validate JSON
+            JsonSerializer.Deserialize<object>(phiData.Data);
+
+            // Generate AES-256 key
+            byte[] key = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(key);
+            }
+
+            // Encrypt data
+            string encryptedPhi = SecretStorage.EncryptData(phiData.Data, key);
+
+            // Store in Blob Storage
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            await containerClient.CreateIfNotExistsAsync();
+            var blobClient = containerClient.GetBlobClient($"{Base64Encode(keyName)}.json");
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(encryptedPhi)))
+            {
+                await blobClient.UploadAsync(stream, true);
+            }
+
+            // Store key in Key Vault
+            await _secretClient.SetSecretAsync($"key-{keyName}", Convert.ToBase64String(key));
+
+            return Result.Success($"PHI stored successfully for {keyName}");
+        }
+        catch (JsonException)
         {
-            try
-            {
-                string keyName = $"{phiData.PatientKey}-{PatientDataCategoryExtensions.GetGuid((PatientDataCategory)phiData.Category)}";
-                if (await DoesKeyExistAsync($"key-{keyName}"))
-                    return Result.Failure($"{keyName} already exists in Key Vault.");
-
-                // Validate JSON
-                JsonSerializer.Deserialize<object>(phiData.Data);
-
-                // Generate AES-256 key
-                byte[] key = new byte[32];
-                using (var rng = RandomNumberGenerator.Create())
-                {
-                    rng.GetBytes(key);
-                }
-
-                // Encrypt data
-                string encryptedPhi = SecretStorage.EncryptData(phiData.Data, key);
-
-                // Store in Blob Storage
-                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-                await containerClient.CreateIfNotExistsAsync();
-                var blobClient = containerClient.GetBlobClient($"{Base64Encode(keyName)}.json");
-                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(encryptedPhi)))
-                {
-                    await blobClient.UploadAsync(stream, true);
-                }
-
-                // Store key in Key Vault
-                await _secretClient.SetSecretAsync($"key-{keyName}", Convert.ToBase64String(key));
-
-                return Result.Success($"PHI stored successfully for {keyName}");
-            }
-            catch (JsonException)
-            {
-                return Result.Failure("Invalid JSON data.");
-            }
-            catch (Exception ex)
-            {
-                return Result.Failure($"Error: {ex.Message}");
-            }
+            return Result.Failure("Invalid JSON data.");
         }
-
-        public async Task<Result<object>> RetrievePhiDataAsync(string patientKey)
+        catch (Exception ex)
         {
-            try
-            {
-                // Retrieve key from Key Vault
-                var keySecret = await _secretClient.GetSecretAsync($"key-{patientKey}");
-                byte[] key = Convert.FromBase64String(keySecret.Value.Value);
-
-                // Retrieve encrypted data from Blob Storage
-                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-                var blobClient = containerClient.GetBlobClient($"{Base64Encode(patientKey)}.json");
-                if (!await blobClient.ExistsAsync())
-                    return Result<object>.Failure("Blob not found.");
-
-                using var stream = new MemoryStream();
-                await blobClient.DownloadToAsync(stream);
-                string encryptedPhi = Encoding.UTF8.GetString(stream.ToArray());
-
-                // Decrypt data
-                string decryptedPhi = SecretStorage.DecryptData(encryptedPhi, key);
-                var dataObject = JsonSerializer.Deserialize<object>(decryptedPhi);
-
-                return Result<object>.Success(dataObject);
-            }
-            catch (CryptographicException ex)
-            {
-                return Result<object>.Failure($"Decryption error: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                return Result<object>.Failure($"Error: {ex.Message}");
-            }
+            return Result.Failure($"Error: {ex.Message}");
         }
+    }
 
-        public async Task<Result> UpdatePhiDataAsync(PhiData phiData)
+    public async Task<Result<object>> RetrievePhiDataAsync(string patientKey)
+    {
+        try
         {
-            try
-            {
-                string keyName = $"{phiData.PatientKey}-{PatientDataCategoryExtensions.GetGuid((PatientDataCategory)phiData.Category)}";
-                var keySecret = await _secretClient.GetSecretAsync($"key-{keyName}");
-                byte[] key = Convert.FromBase64String(keySecret.Value.Value);
+            // Retrieve key from Key Vault
+            var keySecret = await _secretClient.GetSecretAsync($"key-{patientKey}");
+            byte[] key = Convert.FromBase64String(keySecret.Value.Value);
 
-                // Encrypt updated data
-                string encryptedPhi = SecretStorage.EncryptData(phiData.Data, key);
+            // Retrieve encrypted data from Blob Storage
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient($"{Base64Encode(patientKey)}.json");
+            if (!await blobClient.ExistsAsync())
+                return Result<object>.Failure("Blob not found.");
 
-                // Update Blob Storage
-                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-                var blobClient = containerClient.GetBlobClient($"{Base64Encode(keyName)}.json");
-                if (!await blobClient.ExistsAsync())
-                    return Result.Failure("Blob not found.");
+            using var stream = new MemoryStream();
+            await blobClient.DownloadToAsync(stream);
+            string encryptedPhi = Encoding.UTF8.GetString(stream.ToArray());
 
-                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(encryptedPhi)))
-                {
-                    await blobClient.UploadAsync(stream, overwrite: true);
-                }
+            // Decrypt data
+            string decryptedPhi = SecretStorage.DecryptData(encryptedPhi, key);
+            var dataObject = JsonSerializer.Deserialize<object>(decryptedPhi);
 
-                return Result.Success($"PHI updated successfully for {keyName}");
-            }
-            catch (CryptographicException ex)
-            {
-                return Result.Failure($"Encryption error: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                return Result.Failure($"Error: {ex.Message}");
-            }
+            return Result<object>.Success(dataObject);
         }
-
-        public async Task<Result> DeletePhiDataAsync(string patientKey)
+        catch (CryptographicException ex)
         {
-            try
-            {
-                // Delete from Blob Storage
-                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-                var blobClient = containerClient.GetBlobClient($"{Base64Encode(patientKey)}.json");
-                var deleteResponse = await blobClient.DeleteIfExistsAsync();
-                if (!deleteResponse.Value)
-                    return Result.Failure("Blob not found.");
-
-                // Delete key from Key Vault
-                await _secretClient.StartDeleteSecretAsync($"key-{patientKey}");
-
-                return Result.Success("PHI deleted successfully.");
-            }
-            catch (Exception ex)
-            {
-                return Result.Failure($"Error: {ex.Message}");
-            }
+            return Result<object>.Failure($"Decryption error: {ex.Message}");
         }
-
-        private async Task<bool> DoesKeyExistAsync(string keyName)
+        catch (Exception ex)
         {
-            try
-            {
-                await _secretClient.GetSecretAsync(keyName);
-                return true;
-            }
-            catch (Azure.RequestFailedException ex) when (ex.Status == 404)
-            {
-                return false;
-            }
+            return Result<object>.Failure($"Error: {ex.Message}");
         }
+    }
 
-        private static string Base64Encode(string plainText)
+    public async Task<Result> UpdatePhiDataAsync(PhiData phiData)
+    {
+        try
         {
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-            return System.Convert.ToBase64String(plainTextBytes);
-        }
+            string keyName = $"{phiData.PatientKey}-{PatientDataCategoryExtensions.GetGuid((PatientDataCategory)phiData.Category)}";
+            var keySecret = await _secretClient.GetSecretAsync($"key-{keyName}");
+            byte[] key = Convert.FromBase64String(keySecret.Value.Value);
 
-        //private static string Base64Decode(string base64EncodedData)
-        //{
-        //    var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
-        //    return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-        //}
+            // Encrypt updated data
+            string encryptedPhi = SecretStorage.EncryptData(phiData.Data, key);
+
+            // Update Blob Storage
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient($"{Base64Encode(keyName)}.json");
+            if (!await blobClient.ExistsAsync())
+                return Result.Failure("Blob not found.");
+
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(encryptedPhi)))
+            {
+                await blobClient.UploadAsync(stream, overwrite: true);
+            }
+
+            return Result.Success($"PHI updated successfully for {keyName}");
+        }
+        catch (CryptographicException ex)
+        {
+            return Result.Failure($"Encryption error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Error: {ex.Message}");
+        }
+    }
+
+    public async Task<Result> DeletePhiDataAsync(string patientKey)
+    {
+        try
+        {
+            // Delete from Blob Storage
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient($"{Base64Encode(patientKey)}.json");
+            var deleteResponse = await blobClient.DeleteIfExistsAsync();
+            if (!deleteResponse.Value)
+                return Result.Failure("Blob not found.");
+
+            // Delete key from Key Vault
+            await _secretClient.StartDeleteSecretAsync($"key-{patientKey}");
+
+            return Result.Success("PHI deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task<bool> DoesKeyExistAsync(string keyName)
+    {
+        try
+        {
+            await _secretClient.GetSecretAsync(keyName);
+            return true;
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            return false;
+        }
+    }
+
+    private static string Base64Encode(string plainText)
+    {
+        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+        return System.Convert.ToBase64String(plainTextBytes);
     }
 }
