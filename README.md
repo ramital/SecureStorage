@@ -163,9 +163,14 @@ graph TD
   patient -->|can_read| data_category
 ```
 
-* Policies are defined in DSL and propagated dynamically
-* Access propagation (`member -> owner -> can_read`) simplifies delegation
-* Easily support custom roles like `nurse`, `admin`, `researcher`
+- **Fine-Grained Access**: Control access by role, relationship, or context (e.g., assigned doctor → patient).
+- **Relationships inferred (propagated)** through other relationships using defined rules.
+- **HIPAA-Aligned**: Enforces least privilege and supports auditability.
+- **Policy-as-Code**: Declarative, testable, versioned access rules.
+
+
+
+
 
 **DSL Model:**
 
@@ -198,7 +203,7 @@ Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categ
 
 
 
-### 3. **Benefits of AES-256 Data Encryption in Healthcare Data Encryption**
+### 3. **AES-256 in Healthcare Data Encryption**
 
 🔐 Stronger Protection Against Breaches
 - AES-256 is virtually uncrackable with current technology.
@@ -225,10 +230,13 @@ Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categ
 
 ⚠️ What Many Healthcare Systems Use Now
 
-- ❌ Plaintext storage or outdated hashing algorithms like **SHA-1/MD5**.
-- ❌ **AES-128** or **3DES** encryption with weak or missing key management.
-- ❌ Lack of encryption in internal **service-to-service** communication.
-- ❌ Minimal use of **key vaults**, **HSMs**, or automated key rotation mechanisms.
+-  ❌ Plaintext storage or outdated hashing algorithms like **SHA-1/MD5**.
+
+-  ❌ **AES-128** or **3DES** encryption with weak or missing key management.
+
+-  ❌ Lack of encryption in internal **service-to-service** communication.
+
+-  ❌ Minimal use of **key vaults**, **HSMs**, or automated key rotation mechanisms.
 
 
 ---
