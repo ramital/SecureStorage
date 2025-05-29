@@ -163,9 +163,14 @@ graph TD
   patient -->|can_read| data_category
 ```
 
-* Policies are defined in DSL and propagated dynamically
-* Access propagation (`member -> owner -> can_read`) simplifies delegation
-* Easily support custom roles like `nurse`, `admin`, `researcher`
+- **Fine-Grained Access**: Control access by role, relationship, or context (e.g., assigned doctor → patient).
+- **Relationships inferred (propagated)** through other relationships using defined rules.
+- **HIPAA-Aligned**: Enforces least privilege and supports auditability.
+- **Policy-as-Code**: Declarative, testable, versioned access rules.
+
+
+
+
 
 **DSL Model:**
 
@@ -197,8 +202,44 @@ Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categ
 | Doctor     | Identifiers, Medical Records , Biometrics      |
 
 
----
 
+### 3. **AES-256 in Healthcare Data Encryption**
+
+🔐 Stronger Protection Against Breaches
+- AES-256 is virtually uncrackable with current technology.
+- Many legacy systems still use **AES-128**, **3DES**, or **SHA-1**, which are considered weak by modern standards.
+
+📋 HIPAA & Regulatory Compliance
+- AES-256 meets and exceeds encryption standards required by:
+  - **HIPAA**
+  - **HITECH**
+  - **GDPR**
+- Ensures protection against legal risks and regulatory fines in the event of data breaches.
+
+🔁 End-to-End Encryption
+- Secures **data at rest** (e.g., databases, backups) and **data in transit** (e.g., APIs, HL7).
+- Prevents exposure even if systems are compromised internally.
+
+🛡️ Resilient to Future Threats
+- Provides robust defense against brute-force attacks.
+- Offers stronger resistance than AES-128, including **greater resilience to future quantum-based threats**.
+
+ 🤝 Trust and Reputation
+- Demonstrates a commitment to data privacy and modern security standards.
+- Builds patient trust and competitive differentiation in the healthcare industry.
+
+⚠️ What Many Healthcare Systems Use Now
+
+-  ❌ Plaintext storage or outdated hashing algorithms like **SHA-1/MD5**.
+
+-  ❌ **AES-128** or **3DES** encryption with weak or missing key management.
+
+-  ❌ Lack of encryption in internal **service-to-service** communication.
+
+-  ❌ Minimal use of **key vaults**, **HSMs**, or automated key rotation mechanisms.
+
+
+---
 ## 📝 Deployment Instructions
 
 ### Docker-based Setup
