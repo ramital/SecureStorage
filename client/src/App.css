@@ -63,7 +63,7 @@
   border-color: #646cff;
 }
 
-.login-button, .submit-button, .add-patient-button, .logout-button {
+.login-button, .submit-button, .add-patient-button {
   width: 100%;
   padding: 0.75rem;
   background-color: #646cff;
@@ -79,7 +79,7 @@
   gap: 0.5rem;
 }
 
-.login-button:hover, .submit-button:hover, .add-patient-button:hover, .logout-button:hover {
+.login-button:hover, .submit-button:hover, .add-patient-button:hover {
   background-color: #535bf2;
 }
 
@@ -146,22 +146,65 @@
   align-items: center;
 }
 
-.logout-button {
-  width: auto;
+.username-dropdown {
+  position: relative;
+}
+
+.username-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: #ef4444;
+  background-color: #f8fafc;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.logout-button:hover {
-  background-color: #dc2626;
+.username-display:hover {
+  background-color: #e2e8f0;
 }
 
-.logout-icon, .add-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  padding: 2px;
-  background: rgba(255, 255, 255, 0.1);
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+}
+
+.dropdown-content.show {
+  display: block;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: #1e293b;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f8fafc;
+}
+
+.user-icon {
+  width: 20px;
+  height: 20px;
+  color: #64748b;
+}
+
+.logout-icon {
+  width: 20px;
+  height: 20px;
+  color: #64748b;
 }
 
 /* Patient List Styles */
@@ -172,15 +215,19 @@
   min-height: calc(100vh - 64px);
 }
 
+.patient-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
 .patient-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
-  padding: 1rem 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .patient-header h1 {
@@ -190,35 +237,105 @@
   font-weight: 600;
 }
 
-.add-patient-button {
-  width: auto;
-  padding: 0.75rem 1.5rem;
-  background-color: #3b82f6;
-  border-radius: 8px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
+.search-section {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-.add-patient-button:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
+.search-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-label {
+  min-width: 80px;
+  font-weight: 500;
+  color: #1e293b;
+  font-size: 0.875rem;
+  text-align: right;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #646cff;
+  box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.1);
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  grid-column: 1 / -1;
+}
+
+.group-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 120px;
+}
+
+.hr-style {
+  color: rgb(121, 121, 121);
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #dfd9d9;
+    margin: 1em 0;
+    padding: 0; 
+}
+
+
+.group-button-secondary {
+  padding: 0.75rem 1.5rem;
+  background-color: #307541;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 120px;
+}
+
+.group-button:hover {
+  background-color: #535bf2;
+}
+
+.group-button-secondary:hover {
+  background-color: #475569;
 }
 
 .patient-list {
+  padding: 1.5rem 2rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
-  padding: 1rem;
 }
 
 .patient-card {
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   text-align: left;
   transition: all 0.2s ease;
   border: 1px solid #e2e8f0;
@@ -298,6 +415,13 @@
   text-align: left;
 }
 
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
 .section-title {
   color: #1e293b;
   font-size: 1.25rem;
@@ -313,33 +437,4 @@
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
-}
-
-.form-section .form-group {
-  margin-bottom: 1rem;
-}
-
-.form-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-}
-
-.back-button {
-  padding: 0.75rem 1.5rem;
-  background-color: #64748b;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.back-button:hover {
-  background-color: #475569;
 }

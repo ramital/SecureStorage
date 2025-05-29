@@ -24,7 +24,7 @@ public class AuthController : ControllerBase
        
         if (token != null)
         {
-            return Ok(token);
+            return Ok(new{token, model.Username});
         }
         return Unauthorized();
     }
