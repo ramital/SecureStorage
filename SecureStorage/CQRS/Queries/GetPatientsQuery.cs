@@ -1,6 +1,8 @@
-﻿namespace SecureStorage.CQRS.Queries;
+﻿using System.Text.Json.Nodes;
 
-public class GetPatientsQuery : MediatR.IRequest<List<string>>
+namespace SecureStorage.CQRS.Queries;
+
+public class GetPatientsQuery : MediatR.IRequest<List<JsonObject>>
 {
     public string UserId { get; set; }
 

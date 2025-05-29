@@ -11,6 +11,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. Register CORS
+builder.Services.AddCors(o => o.AddPolicy("AllowReactDev", p => p
+    .WithOrigins("http://localhost:5173")
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials()
+));
+
 // 1) Bind Keycloak settings
 builder.Services.Configure<KeycloakOptions>(
   builder.Configuration.GetSection("Keycloak"));
@@ -101,6 +109,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowReactDev");
 
 app.UseAuthentication();
 app.UseAuthorization();

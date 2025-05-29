@@ -8,7 +8,7 @@ namespace SecureStorage.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PatientController(IMediator mediator) : Controller
+public class PatientsController(IMediator mediator) : Controller
 {
     private readonly IMediator _mediator = mediator;
 
@@ -24,7 +24,7 @@ public class PatientController(IMediator mediator) : Controller
             var query = new GetPatientsQuery(userId);
             var patients = await _mediator.Send(query);
 
-            return Ok(new {  Patients = patients.OrderBy(q => q).ToList() });
+            return Ok(new {  Patients = patients });
         }
         catch (Exception ex)
         {

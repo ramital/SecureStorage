@@ -12,8 +12,13 @@ public static class PatientDataCategoryExtensions
         { PatientDataCategory.BiometricData,  new Guid("71df5d4b-19c7-4bb0-8796-2ce0ff444b91") },
     };
 
+    private static readonly Dictionary<Guid, PatientDataCategory> _guidToCategory =
+        _categoryGuids.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+
     public static Guid GetGuid(this PatientDataCategory category)
-    {
-        return _categoryGuids[category];
-    }
+        => _categoryGuids[category];
+
+    public static PatientDataCategory GetCategory(this Guid guid)
+    => _guidToCategory.TryGetValue(guid, out var cat)
+        ? cat  : throw new ArgumentException($"No category found for GUID: {guid}", nameof(guid));
 }
