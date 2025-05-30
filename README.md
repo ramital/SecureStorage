@@ -47,7 +47,7 @@ The PHI Secure Storage UI is a lightweight React application serving as the fron
 - Responsive layout optimized for tablets and desktops
 - Seamless JWT authentication and OpenFGA-based authorization
 
-**Use Case:** A rural clinic uses this UI to manage encrypted PHI, allowing clinicians to retrieve records by category (e.g., medical history, biometric data) while keeping access tightly controlled and auditable.
+**Use Case:** A rural clinic uses this UI to manage encrypted PHI, allowing clinicians to retrieve records by category (e.g., medical history, insurance data...) while keeping access tightly controlled and auditable. 
 
 ## 📁 System Architecture & Docs
 
@@ -81,9 +81,10 @@ Includes:
 |---------------------------|------------------------------------------------------------------------|---------------------------------------|
 | AES-256 Encryption        | Protects PHI, reducing breach risk by 50% (per NIST SP 800-53)         | Meets HIPAA/NIST standards            |
 | Key Vault + Blob Storage  | Prevents developer/admin overreach with key/data isolation             | Enforces separation of duties         |
-| OpenFGA Access Control    | Dynamic policies tied to roles (e.g., Nurse, Doctor)                   | Supports least privilege & auditability |
+| OpenFGA Access Control    | Dynamic policies tied to roles (e.g., Nurse, Doctor..,)                | Supports least privilege & auditability |
 | React UI + API Integration| Makes secure PHI access user-friendly for non-technical staff          | Enables compliant workflows           |
-| Docker Deployment         | Saves $50,000-$100,000/year vs. traditional infrastructure             | Encourages adoption at scale          |
+| Docker Deployment         | Simplifies setup, scaling, and CI/CD integration reducing, infrastructure overhead | Promotes easier adoption and environment consistency |
+
 
 ## 🔁 Impact
 
@@ -101,7 +102,7 @@ This solution directly supports federal goals in:
 - 50% Risk Reduction from access violations
 - Scalable to Enterprise-Grade PHI handling
 
-##🛡️ Future Plans
+## 🛡️ Future Plans
 
 - Patient Consent ledger (blockchain-backed)
 - Key rotation & HMAC integrity checks
@@ -120,4 +121,4 @@ MIT. LICENSE.
 
 ## About the Author
 
-This solution was developed by Ahmad Rami El Tal, a Senior Software Engineer with expertise in regulated environments, cloud security, and telehealth platforms. It is based on real world implementations and aims to reduce the $10B+ annual impact of healthcare data breaches in the U.S. As an active HIMSS Digital Member (joined 2025), I am refining this solution for potential presentation at HIMSS26, with a focus on scalable PHI security tailored for underserved healthcare providers.
+Developed by Ahmad Rami El Tal, this solution tackles healthcare data breaches with scalable PHI security. As a HIMSS Digital Member (since 2025), I’m refining it with the goal of presenting it at HIMSS26.
