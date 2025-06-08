@@ -58,7 +58,7 @@ The PHI Secure Storage UI is a lightweight React application serving as the fron
 - A 10-minute OTP consent link is sent to the patient with the consent form.
 - Upon patient acceptance, the system UI instantly redirects to the patient creation screen, capturing the patient's name.
 ## Mobile Consent Received by Patient for Remote Acceptance
-<img src="./docs/mobile.gif" style="max-height:600px;text-align:left">
+<img src="./docs/mobile.gif" height="700">
 
 - Patients can remotely accept or decline consent requests within 10-minute (e.g. via a mobile device)
 
