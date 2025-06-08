@@ -1,7 +1,6 @@
 # Healthcare PHI Secure Storage Service
 
-This project is a HIPAA-aligned secure storage platform designed to address systemic vulnerabilities in U.S. healthcare data infrastructure. It provides small and mid-sized providers with enterprise-grade tools to securely store, retrieve, and manage Protected Health Information (PHI). Developed using .NET 8, Azure services, React, OpenFGA, and Keycloak, the solution reflects compliance with U.S. federal cybersecurity frameworks, supports digital modernization efforts, and introduces responsibility-spread key management to enforce zero-trust decryption via multi-party collaboration
-
+This project is a HIPAA-compliant secure storage platform addressing vulnerabilities in U.S. healthcare data infrastructure. Tailored for small and mid-sized providers, it offers enterprise-grade tools for secure storage, retrieval, and management of Protected Health Information (PHI). It integrates patient consent management with real-time OTP verification and includes a tamper-proof blockchain audit trail. Built with .NET 8, Azure services, React, OpenFGA, and Keycloak, it ensures compliance with U.S. federal cybersecurity frameworks, supports digital modernization, and implements responsibility-spread key management for zero-trust decryption through multi-party collaboration.
 ## 📌 What It Solves
 
 - **Zero-Trust PHI Protection:** Combines AES-256 encryption, Azure Blob Storage, Key Vault, and OpenFGA to ensure that only explicitly authorized services (via JWT + policy) can access encrypted PHI mitigating ~$10B annual breach costs (Ponemon Institute, 2023).
@@ -21,6 +20,7 @@ This project is a HIPAA-aligned secure storage platform designed to address syst
 ## 🛡️ Core Backend Features
 
 - Azure Blob Storage and Key Vault for scalable, separated storage and key handling
+- Azure Confidential Ledger provides immutable, tamper-evident storage for audit trails of patient consent
 - OpenFGA for fine-grained access control by role and relationship
 - Token-based authentication (JWT) via Keycloak
 - Secure REST API endpoints tested via Swagger
@@ -35,17 +35,42 @@ This project is a HIPAA-aligned secure storage platform designed to address syst
 - **Resilience in Multi-Tenant Environments:** Isolates key access per data category and role, limiting breach impact.
 - **Trust & Legal Assurance:** Provides legal defensibility in audits or breach investigations, reducing financial and reputational risk.
 
+## 📋 Blockchain Audit Trail (Azure Confidential Ledger) 🆕
+
+- Uses **Azure Confidential Ledger** for tamper-proof, blockchain-based logging.
+- Creates an **immutable audit trail** for PHI access and patient consent events.
+- Leverages **Trusted Execution Environments (TEEs)** for confidential computing.
+- Complies with **HIPAA 164.312(b)** audit control standards.
+- Prevents alteration of access logs by admins, developers, or insiders.
+- Enhances **zero-trust security** and legal audit defensibility.
 
 ## 🏥 Frontend – PHI Secure Storage UI (React)
 
 The PHI Secure Storage UI is a lightweight React application serving as the front-end interface for this secure backend. Designed with compliance and usability in mind, the UI enables:
 
-![UI Demo](./docs/UIdemo.gif)
+## Login Flow
+![Login Flow Demo](./docs/UIdemo.gif)
+- Users securely authenticate to access the system.
 
-- Secure patient record upload and retrieval
-- Role-based display and field-level encryption access
-- Responsive layout optimized for tablets and desktops
-- Seamless JWT authentication and OpenFGA-based authorization
+## User Sends Consent via SMS or Email
+![Consent Sending Demo](./docs/consent.gif)
+**OTP Consent Process**
+- A 10-minute OTP consent link is sent to the patient with the consent form.
+- Upon patient acceptance, the system UI instantly redirects to the patient creation screen, capturing the patient's name.
+## Mobile Consent Received by Patient for Remote Acceptance
+<img src="./docs/mobile.gif" style="max-height:600px;text-align:left">
+
+- Patients can remotely accept or decline consent requests within 10-minute (e.g. via a mobile device)
+
+## Benefits
+
+- **Secure Patient Record Management**: Encrypted upload and retrieval of patient records.
+- **Granular Access Control**: Role-based display with field-level encryption.
+- **Enhanced Clinical Efficiency**: Real-time search and filtering of patient data.
+- **Responsive Design**: Optimized for seamless use on tablets and desktops.
+- **Robust Authentication & Authorization**: Seamless JWT authentication and OpenFGA-based access control.
+- **Patient Consent Management**: Secure, real-time consent delivery and acceptance via SMS or email with OTP verification.
+
 
 **Use Case:** A rural clinic uses this UI to manage encrypted PHI, allowing clinicians to retrieve records by category (e.g., medical history, insurance data...) while keeping access tightly controlled and auditable. 
 
@@ -61,7 +86,26 @@ Frontend (React UI) – Implementation details and usage guide available in the 
 
 ## 🛋‍ Quick Start
 
-```bash
+### Configuration Setup
+
+To run the project, configure your `appsettings.json` and `docker-compose.override.yml` with environment-specific values:
+
+**appsettings.json**
+```json
+  "KeyVaultUrl": "<your-key-vault-url>",
+  "ConnectionsVaultUrl": "<your-connections-vault-url>",
+  "LedgerEndpoint": "<your-ledger-endpoint>"
+```
+**docker-compose.override.yml**
+```
+environment:
+  - AZURE_CLIENT_ID=<your-client-id>
+  - AZURE_TENANT_ID=<your-tenant-id>
+  - AZURE_CLIENT_SECRET=<your-client-secret>
+  ```
+
+**Run the Project**
+```
 git clone https://github.com/ramital/SecureStorage
 docker-compose up -d
 ```
@@ -71,8 +115,6 @@ Includes:
 - OpenFGA auth server (PostgreSQL backend)
 - Keycloak (OIDC Provider)
 - React UI for PHI access
-
-**Configuration:** Update `appsettings.json` with your Azure Blob/Key Vault and Keycloak credentials.
 
 
 ## 🤝 Real-World Benefits
@@ -104,7 +146,6 @@ This solution directly supports federal goals in:
 
 ## 🛡️ Future Plans
 
-- Patient Consent ledger (blockchain-backed)
 - Key rotation & HMAC integrity checks
 
 

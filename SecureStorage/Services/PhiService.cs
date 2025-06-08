@@ -1,8 +1,9 @@
 ﻿using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
+using OpenFga.Sdk.Client;
+using OpenFga.Sdk.Client.Model;
 using SecureStorage.Helpers;
 using SecureStorage.Models;
-using System.Buffers.Text;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -14,11 +15,13 @@ public class PhiService : IPhiService
     private readonly BlobServiceClient _blobServiceClient;
     private readonly SecretClient _secretClient;
     private readonly string _containerName = "encrypteddb";
+    public readonly OpenFgaClient _fgaClient;
 
-    public PhiService(BlobServiceClient blobServiceClient, SecretClient secretClient)
+    public PhiService(BlobServiceClient blobServiceClient, SecretClient secretClient,OpenFgaClient fgaClient)
     {
         _blobServiceClient = blobServiceClient;
         _secretClient = secretClient;
+        _fgaClient = fgaClient;
     }
 
     public async Task<Result> StorePhiDataAsync(PhiData phiData)
@@ -53,6 +56,8 @@ public class PhiService : IPhiService
 
             // Store key in Key Vault
             await _secretClient.SetSecretAsync($"key-{keyName}", Convert.ToBase64String(key));
+
+            await  AssignOwnerRolesAsync(keyName);
 
             return Result.Success($"PHI stored successfully for {keyName}");
         }
@@ -154,6 +159,21 @@ public class PhiService : IPhiService
         {
             return Result.Failure($"Error: {ex.Message}");
         }
+    }
+
+    private async Task AssignOwnerRolesAsync(string patientId)
+    {
+        var groups = new[] { "group:nurse", "group:doctor", "group:administrative" };
+        var objectId = $"patient:{patientId}";
+
+        var Writes = groups.Select(group => new ClientTupleKey
+        {
+            User = group,
+            Relation = "owner",
+            Object = objectId
+        }).ToList();
+
+        await _fgaClient.WriteTuples(Writes);
     }
 
     private async Task<bool> DoesKeyExistAsync(string keyName)

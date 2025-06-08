@@ -7,7 +7,7 @@ namespace SecureStorage.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+//[Authorize]
 
 public class PhiController : ControllerBase
 {

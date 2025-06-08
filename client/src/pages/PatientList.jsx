@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
 import { API_URL } from '../utils/constants'
-import { calculateAge } from '../utils/helpers'
+import { calculateAge, capitalize } from '../utils/helpers'
 
 function PatientList() {
   const [patients, setPatients] = useState([])
@@ -16,7 +16,6 @@ function PatientList() {
     age: ''
   })
   const navigate = useNavigate()
-  const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
   const handleSearch = () => {
   }
@@ -56,8 +55,7 @@ function PatientList() {
           </h4>
           <div className="pl-4 border-l-2 border-gray-200">
             <RenderFields data={val} exclude={[]} />
-            <span   className="hr-style"/>
-
+                <span   className="hr-style"/>
           </div>
         </div>
       ) : (
@@ -174,12 +172,12 @@ function PatientList() {
             </div>
              
             <div className="search-group">
-              <button
-                className="group-button-secondary"
-                onClick={() => navigate('/add-patient')}
-              >
-                Add New Patient
-              </button>
+                <button
+                  className="group-button-secondary"
+                  onClick={() => navigate('/patient-consent')}
+                >
+                  Add New Patient
+                </button>
               <button onClick={handleSearch} className="group-button">
                 Search
               </button>
