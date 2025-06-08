@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SecureStorage.CQRS.Queries;
+using SecureStorage.Application.CQRS.Queries;
 
-namespace SecureStorage.Controllers;
+namespace SecureStorage.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

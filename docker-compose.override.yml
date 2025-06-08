@@ -1,5 +1,8 @@
 services:
   securestorage:
+    build:
+       context: .
+       dockerfile: SecureStorage/Dockerfile
     ports:
       - "32773:443"
     environment:
