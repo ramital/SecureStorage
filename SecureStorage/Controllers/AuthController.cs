@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SecureStorage.Application.Interfaces;
 using SecureStorage.Models;
-using SecureStorage.Services;
 
-namespace SecureStorage.Controllers;
+namespace SecureStorage.API.Controllers;
 
 [AllowAnonymous]
 [Route("api/[controller]")]

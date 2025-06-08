@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SecureStorage.Models;
-using SecureStorage.Services;
+using SecureStorage.Application.DTOs;
+using SecureStorage.Application.Interfaces;
 
-namespace SecureStorage.Controllers
+namespace SecureStorage.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -18,7 +18,7 @@ namespace SecureStorage.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ConsentResponse>> PostConsent([FromBody] ConsentRequest request)
+        public async Task<ActionResult<ConsentResult>> PostConsent([FromBody] ConsentDto request)
         {
             var response = await _consentService.CreateConsentAsync(request);
             return Ok(response);
@@ -26,11 +26,15 @@ namespace SecureStorage.Controllers
 
 
         [HttpGet("{patientId}")]
-        public async Task<ActionResult<ConsentResponse>> GetConsent(string patientId)
+        public async Task<ActionResult<ConsentResult>> GetConsent(string patientId)
         {
             try
             {
                 var response = await _consentService.GetConsentAsync(patientId);
+                if (response == null)
+                {
+                    return NotFound(new { Message = "Consent not found for the specified patient." });
+                }
                 return Ok(response);
             }
             catch (Azure.RequestFailedException ex) when (ex.Status == 404)

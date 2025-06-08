@@ -4,14 +4,13 @@ using Azure.Security.ConfidentialLedger;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenFga.Sdk.Client;
-using SecureStorage.CQRS.Queries;
-using SecureStorage.Helpers;
-using SecureStorage.Repositories;
-using SecureStorage.Services;
-using System;
+using SecureStorage.Application.CQRS.Queries;
+using SecureStorage.Application.Interfaces;
+using SecureStorage.Application.Services;
+using SecureStorage.Application.Options;
+using SecureStorage.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,11 +20,6 @@ builder.Services.AddCors(o => o.AddPolicy("AllowReactDev", p => p
     .AllowAnyMethod()
     .AllowAnyHeader()
     .AllowCredentials()));
-
-// Keycloak configuration
-//builder.Services.Configure<KeycloakOptions>(builder.Configuration.GetSection("Keycloak"));
-//var keycloakOpts = builder.Configuration.GetSection("Keycloak").Get<KeycloakOptions>()!;
-
 
 
 // Azure services

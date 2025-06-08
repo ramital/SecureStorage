@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SecureStorage.Models;
-using SecureStorage.Services;
+using SecureStorage.Application.DTOs;
+using SecureStorage.Application.Interfaces;
 
-namespace SecureStorage.Controllers;
+namespace SecureStorage.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-//[Authorize]
+[Authorize]
 
 public class PhiController : ControllerBase
 {
