@@ -6,12 +6,17 @@
 record AzureOptions
 {
     /// <summary>
-    /// Gets or sets the connection string for Azure Blob Storage.
+    /// Gets or sets the connection string for Ledger Endpoint.
     /// </summary>
-    public string BlobStorageConnectionString { get; set; }
+    public string LedgerEndpoint { get; set; }
 
     /// <summary>
     /// Gets or sets the URL for Azure Key Vault.
     /// </summary>
     public string KeyVaultUrl { get; set; }
+
+    /// <summary>
+    /// Gets or sets the URL for Azure Key Vault.
+    /// </summary>
+    public string ConnectionsVaultUrl { get; set; }
 }

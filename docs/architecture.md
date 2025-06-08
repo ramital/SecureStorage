@@ -1,19 +1,9 @@
-﻿# Healthcare PHI Secure Storage Service
-
-I designed and implemented a robust .NET Core-based API to securely store and retrieve Protected Health Information (PHI) for healthcare providers, leveraging Azure services and modern authorization models. Built to ensure HIPAA compliance, high security, and granular access control, this solution uses AES-256 encryption to protect PHI, Azure Blob Storage for scalable data storage, and Azure Key Vault for secure key management. I integrated OpenFGA for fine-grained, role-based access control (e.g., Admin, Doctor, Nurse) and implemented JWT using Keycloak token-based authentication for secure, stateless authorization. The API supports RESTful operations for seamless integration with EHR systems and is deployable via Docker for consistent, portable environments. Developed using C#, .NET 8, Azure Identity for authentication, and Swagger for API testing, this project reflects my expertise gained as a Senior Software Engineer in the healthcare sector, where I developed secure  platforms for 1M+ patients. My goal is to reduce the $10B annual U.S. healthcare data breach cost (Ponemon Institute, 2023) by delivering a scalable, secure, and compliant solution, enhancing patient trust and access to care, particularly in underserved regions.
- 
-
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/d2a69278-69f6-4d9b-bec4-55e02a7ce9c3"
-       width="400" />
-</p>
+﻿# Design Overview
 
 
 
-the "Healthcare PHI Secure Storage Service" can evolve into a third-party Data Protection-as-a-Service, enabling healthcare organizations to securely store and access PHI via token-based control. Data will be encrypted with AES-256 using multiple responsibility-spread keys, requiring all parties (e.g., authentication, storage, and key management teams) to collaborate for decryption, ensuring no single entity can access the data. Keys will be stored in Azure Key Vault under departmental oversight, while encrypted blobs in Azure Blob Storage will be managed by a separate team, enforcing strict separation of duties. Only authorized users, validated via tokens and OpenFGA policies, can access specific data, enhancing security and compliance for healthcare providers.
+A .NET 8-based API that provides secure, compliant storage and retrieval of Protected Health Information (PHI) and patient consent data. The architecture leverages AES-256 encryption, Azure Blob Storage for scalable storage, and Azure Key Vault for centralized key management. Fine-grained, role-based access control is enforced via OpenFGA, while authentication and authorization are managed through Keycloak and JWT tokens. Consent management APIs allow patients to control access to their data, with all actions fully auditable. The API supports RESTful integration, is containerized with Docker for portability, and utilizes C#, Azure Identity, and Swagger. The platform is designed to reduce data breach risks and costs, increase patient data control, and ensure regulatory compliance, with a forward-looking architecture ready for distributed key management, strict separation of duties, policy-driven access, and immutable, auditable consent records at scale.
 
----
 
 ## 🚀 Overview
 
@@ -21,6 +11,7 @@ This project delivers a **cloud-native, zero-trust** architecture to protect PHI
 
 * **AES-256 encryption** for data confidentiality
 * **Azure Blob Storage** for scalable encrypted data storage
+* **Azure Confidential Ledger** for immutable, tamper-evident storage for audit trails of patient consent
 * **Azure Key Vault** for secure key management
 * **OpenFGA** for dynamic role-based access control (backed by PostgreSQL) 
 * **Dockerized microservice** deployment for simplicity and reproducibility
@@ -95,7 +86,7 @@ sequenceDiagram
 ## 🏛 Simplified Data Storage Example 
 ```mermaid
 graph TD
-    %% Data Storage Structure
+    %% Existing Data Storage Structure
     A[Azure Blob Storage] -->|PatientId: 123| B[Category: Identifiers]
     B --> C[Encrypted Blob: 123_Identifiers_timestamp.json]
     C --> D[Fields: fullName: John Doe, dob: 1985-04-12, ssn: 123-45-6789, mrn: MRN00123]
@@ -108,11 +99,16 @@ graph TD
     H[Azure Key Vault] -->|PatientId: 123| I[Key: key-123-Identifiers]
     H -->|PatientId: 123| J[Key: key-123-MedicalRecords]
 
-    %% OpenFGA
-    K[Role-Based Access via OpenFGA] -->|can_read| L[Groups]
-    L --> M[Role: Admin Access: Identifiers MedicalRecords FinancialInfo ContactInfo InsuranceInfo BiometricData]
-    L --> N[Role: Doctor Access: Identifiers MedicalRecords ContactInfo BiometricData]
-    L --> O[Role: Nurse Access: Identifiers MedicalRecords ContactInfo]
+    %% OpenFGA Roles
+    K[Role-Based Access via OpenFGA] -->|can_read Identifiers| L1[Doctor, Nurse, Admin]
+    K -->|can_read MedicalRecords| L2[Doctor, Admin]
+    L1 --> M[Doctor Access: Identifiers, MedicalRecords, ContactInfo, BiometricData]
+    L1 --> N[Nurse Access: Identifiers, MedicalRecords, ContactInfo]
+    L1 --> O[Admin Access: Identifiers, MedicalRecords, FinancialInfo, ContactInfo, InsuranceInfo, BiometricData]
+
+    %% New Consent-Logging Portion
+        P[Patient Consent] -->|Append JSO patientId:123, allowed:Identifiers,MedicalRecords, ts | R[Azure Confidential Ledger]
+        R --> S[Entry: txId 0001, patientId:123, allowed:Identifiers,MedicalRecords, timestamp]
 ```
 <p>This diagram provides a simplified example of PHI data storage for PatientId: 123, organized by categories (e.g., Identifiers, MedicalRecords) in Azure Blob Storage, with AES-256 encryption keys managed in Azure Key Vault. It also illustrates the OpenFGA role-based access model, defining permissions for roles like Admin, Doctor, and Nurse across data categories.
 </p>
@@ -171,17 +167,19 @@ Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categ
 
 
 
-### 3. **AES-256 in Healthcare Data Encryption**
+###  3. Blockchain Architecture (Azure Confidential Ledger)
+
+- Uses Azure Confidential Ledger for a tamper-proof audit trail of PHI access|
+- Immutable, cryptographically signed transactions for PHI and consent events.
+- Managed by Azure for low-latency validation.
+- Azure-hosted validator and auditor nodes.
+
+
+### 4. **AES-256 in Healthcare Data Encryption**
 
 🔐 Stronger Protection Against Breaches
 - AES-256 is virtually uncrackable with current technology.
 - Many legacy systems still use **AES-128**, **3DES**, or **SHA-1**, which are considered weak by modern standards.
-
-📋 HIPAA & Regulatory Compliance
-- AES-256 meets and exceeds encryption standards required by:
-  - **HIPAA**
-  - **HITECH**
-  - **GDPR**
 - Ensures protection against legal risks and regulatory fines in the event of data breaches.
 
 🔁 End-to-End Encryption
@@ -192,22 +190,7 @@ Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categ
 - Provides robust defense against brute-force attacks.
 - Offers stronger resistance than AES-128, including **greater resilience to future quantum-based threats**.
 
- 🤝 Trust and Reputation
-- Demonstrates a commitment to data privacy and modern security standards.
-- Builds patient trust and competitive differentiation in the healthcare industry.
 
-⚠️ What Many Healthcare Systems Use Now
-
--  ❌ Plaintext storage or outdated hashing algorithms like **SHA-1/MD5**.
-
--  ❌ **AES-128** or **3DES** encryption with weak or missing key management.
-
--  ❌ Lack of encryption in internal **service-to-service** communication.
-
--  ❌ Minimal use of **key vaults**, **HSMs**, or automated key rotation mechanisms.
-
-
----
 ## 🔹 Swagger UI
 ![Swagger UI](./swagger.png)
 
@@ -216,6 +199,10 @@ Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categ
 
 ## 🔹 Azure Key Vault Secrets
 ![Key Vault Secrets](./keys.png)
+
+## 🔹 Azure Confidential Ledger
+![Key Vault Secrets](./ledger.png)
+
 
 ## 🔹 Keycloak (OIDC Provider)
 ![Keycloak Login](./keycloak.png)

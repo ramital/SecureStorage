@@ -1,14 +1,21 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
 import { API_URL } from '../utils/constants'
 
 function AddPatient() {
   const navigate = useNavigate()
+  const location = useLocation()
+  
+  // Get patient data from consent page if coming from there
+  const initialPatientName = location.state?.patientName || ''
+  const fromConsent = location.state?.fromConsent || false
+  const consentPatientId = location.state?.patientId || null // Get the GUID from consent
+  
   const [formData, setFormData] = useState({
     Identifiers: {
-      fullName: '',
+      fullName: initialPatientName,
       dob: '',
       ssn: '',
       mrn: ''
@@ -25,6 +32,16 @@ function AddPatient() {
     }
   })
   const [error, setError] = useState('')
+
+  // Show a brief message if coming from consent acceptance
+  useEffect(() => {
+    if (fromConsent && initialPatientName) {
+      console.log(`Adding patient details for: ${initialPatientName}`)
+      if (consentPatientId) {
+        console.log(`Using consent patient ID: ${consentPatientId}`)
+      }
+    }
+  }, [fromConsent, initialPatientName, consentPatientId])
 
   const handleChange = (section, field, value) => {
     setFormData(prev => ({
@@ -45,11 +62,34 @@ function AddPatient() {
         return
       }
 
-      await axios.post(`${API_URL}/patients`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+      // Use the GUID from consent form if available, otherwise show error
+      if (!consentPatientId) {
+        setError('No patient ID available. Please go through the consent process first.')
+        return
+      }
+
+      // Prepare the API payload in the specified format
+      const apiPayload = {
+        PatientKey: consentPatientId, // Use the GUID from consent form
+        Data: JSON.stringify(formData.Identifiers), // Only send Identifiers as JSON string
+        Category: 0 // Set Category to 0 as specified
+      }
+
+      console.log('Sending patient data with consent GUID:', apiPayload)
+
+      await axios.post(`${API_URL}/phi`, apiPayload, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       })
+      
+      console.log('Patient added successfully with consent GUID:', consentPatientId)
+      
+      // Navigate back to patients list after successful creation
       navigate('/patients')
     } catch (err) {
+      console.error('Failed to add patient:', err)
       if (err.response?.status === 401) {
         navigate('/login')
       } else {
@@ -65,6 +105,12 @@ function AddPatient() {
         <div className="add-patient-box">
           <div className="form-header">
             <h1>Add New Patient</h1>
+            {fromConsent && (
+              <div className="consent-info" style={{ marginBottom: '1rem' }}>
+                <p>✅ Consent accepted for <strong>{initialPatientName}</strong></p>
+                <p>Please complete the patient details below.</p>
+              </div>
+            )}
           </div>
           {error && <p className="error-message">{error}</p>}
           <form onSubmit={handleSubmit}>
@@ -78,6 +124,7 @@ function AddPatient() {
                   value={formData.Identifiers.fullName}
                   onChange={(e) => handleChange('Identifiers', 'fullName', e.target.value)}
                   placeholder="Enter full name"
+                  required
                 />
               </div>
               <div className="form-group">
@@ -87,6 +134,7 @@ function AddPatient() {
                   id="dob"
                   value={formData.Identifiers.dob}
                   onChange={(e) => handleChange('Identifiers', 'dob', e.target.value)}
+                  required
                 />
               </div>
               <div className="form-group">
@@ -179,6 +227,7 @@ function AddPatient() {
               </div>
               <div className="button-group">
                 <button
+                  type="button"
                   className="group-button-secondary"
                   onClick={() => navigate('/patients')}
                 >

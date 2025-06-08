@@ -6,6 +6,10 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_ENVIRONMENT=Development
       - Keycloak__Authority=http://keycloak:8080/realms/securestorage
+      # ADD SECRETS HERE
+      - AZURE_CLIENT_ID=
+      - AZURE_TENANT_ID=
+      - AZURE_CLIENT_SECRET=
     volumes:
       - ${USERPROFILE}\.aspnet\https:/https:ro
     depends_on:
@@ -67,7 +71,7 @@ services:
       - KC_DB=postgres
       - KC_DB_URL_HOST=postgres
       - KC_DB_URL_PORT=5432
-      - KC_DB_URL_DATABASE=keycloak
+      - KC_DB_URL_DATABASE=postgres
       - KC_DB_USERNAME=openfga
       - KC_DB_PASSWORD=openfga
       - QUARKUS_TRANSACTION_MANAGER_ENABLE_RECOVERY=true

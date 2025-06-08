@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import PatientList from './pages/PatientList'
 import AddPatient from './pages/AddPatient'
+import PatientConsent from './pages/PatientConsent'
+import PatientConsentForm from './pages/PatientConsentForm'
 import './App.css'
 
 function PrivateRoute({ children }) {
@@ -13,7 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/\" element={<Navigate to="/login\" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/patients" element={
           <PrivateRoute>
@@ -25,7 +27,14 @@ function App() {
             <AddPatient />
           </PrivateRoute>
         } />
-        <Route path="*" element={<Navigate to="/login\" replace />} />
+        <Route path="/patient-consent" element={
+          <PrivateRoute>
+            <PatientConsent />
+          </PrivateRoute>
+        } />
+        {/* Public route - no authentication required */}
+        <Route path="/consent/:patientId" element={<PatientConsentForm />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   )
