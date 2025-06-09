@@ -13,9 +13,8 @@ This project is a HIPAA-compliant secure storage platform addressing vulnerabili
 
 - **Affordable Data Protection-as-a-Service (DPaaS):** Deployable via Azure for ~$0.255/year per GB, saving $50K–$100K annually compared to legacy systems supporting HIPAA compliance in underserved communities.
 
-- **Global, Centralized Governance:** Supports multi-region deployments with consistent access rules and key policies, scaling securely across health systems and jurisdictions.
-
-
+- **Tamper-Proof Audit Trail:** Offers immutable blockchain logging via Azure Confidential Ledger, ensuring secure patient consent and unalterable record-keeping for compliance.
+ 
 
 ## 🛡️ Core Backend Features
 
@@ -35,7 +34,7 @@ This project is a HIPAA-compliant secure storage platform addressing vulnerabili
 - **Resilience in Multi-Tenant Environments:** Isolates key access per data category and role, limiting breach impact.
 - **Trust & Legal Assurance:** Provides legal defensibility in audits or breach investigations, reducing financial and reputational risk.
 
-## 📋 Blockchain Audit Trail (Azure Confidential Ledger) 🆕
+## 📋 Blockchain Audit Trail (Azure Confidential Ledger) 
 
 - Uses **Azure Confidential Ledger** for tamper-proof, blockchain-based logging.
 - Creates an **immutable audit trail** for PHI access and patient consent events.
@@ -46,31 +45,8 @@ This project is a HIPAA-compliant secure storage platform addressing vulnerabili
 
 ## 🏥 Frontend – PHI Secure Storage UI (React)
 
-The PHI Secure Storage UI is a lightweight React application serving as the front-end interface for this secure backend. Designed with compliance and usability in mind, the UI enables:
-
-## Login Flow
-![Login Flow Demo](./docs/UIdemo.gif)
-- Users securely authenticate to access the system.
-
-## User Sends Consent via SMS or Email
-![Consent Sending Demo](./docs/consent.gif)
-**OTP Consent Process**
-- A 10-minute OTP consent link is sent to the patient with the consent form.
-- Upon patient acceptance, the system UI instantly redirects to the patient creation screen, capturing the patient's name.
-## Mobile Consent Received by Patient for Remote Acceptance
-<img src="./docs/mobile.gif" height="700">
-
-- Patients can remotely accept or decline consent requests within 10-minute (e.g. via a mobile device)
-
-## Benefits
-
-- **Secure Patient Record Management**: Encrypted upload and retrieval of patient records.
-- **Granular Access Control**: Role-based display with field-level encryption.
-- **Enhanced Clinical Efficiency**: Real-time search and filtering of patient data.
-- **Responsive Design**: Optimized for seamless use on tablets and desktops.
-- **Robust Authentication & Authorization**: Seamless JWT authentication and OpenFGA-based access control.
-- **Patient Consent Management**: Secure, real-time consent delivery and acceptance via SMS or email with OTP verification.
-
+The PHI Secure Storage UI is a lightweight React application serving as the front-end interface for this secure backend. 
+[Check Frontend](./client/README.md)
 
 **Use Case:** A rural clinic uses this UI to manage encrypted PHI, allowing clinicians to retrieve records by category (e.g., medical history, insurance data...) while keeping access tightly controlled and auditable. 
 
@@ -123,6 +99,7 @@ Includes:
 |---------------------------|------------------------------------------------------------------------|---------------------------------------|
 | AES-256 Encryption        | Protects PHI, reducing breach risk by 50% (per NIST SP 800-53)         | Meets HIPAA/NIST standards            |
 | Key Vault + Blob Storage  | Prevents developer/admin overreach with key/data isolation             | Enforces separation of duties         |
+| Azure Confidential Ledger | Provides tamper-proof, blockchain-based audit trail | Ensures immutable record-keeping |
 | OpenFGA Access Control    | Dynamic policies tied to roles (e.g., Nurse, Doctor..,)                | Supports least privilege & auditability |
 | React UI + API Integration| Makes secure PHI access user-friendly for non-technical staff          | Enables compliant workflows           |
 | Docker Deployment         | Simplifies setup, scaling, and CI/CD integration reducing, infrastructure overhead | Promotes easier adoption and environment consistency |
@@ -144,9 +121,6 @@ This solution directly supports federal goals in:
 - 50% Risk Reduction from access violations
 - Scalable to Enterprise-Grade PHI handling
 
-## 🛡️ Future Plans
-
-- Key rotation & HMAC integrity checks
 
 
 

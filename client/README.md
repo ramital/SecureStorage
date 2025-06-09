@@ -5,7 +5,7 @@ The PHI Secure Storage UI a lightweight React front-end designed to interact wit
 🔐 Built with compliance in mind, the UI enforces access control (e.g., via JWT and OpenFGA), supports multi-tenant environments, and integrates seamlessly with backend services like Azure Blob Storage and Key Vault.
 
 🏥 Use Case: A small clinic can use this UI to manage encrypted ePHI files without needing complex IT infrastructure—enabling secure patient data workflows in line with HIPAA guidelines.
-
+ 
 ## Features
 
 - Secure authentication system
@@ -22,6 +22,19 @@ The PHI Secure Storage UI a lightweight React front-end designed to interact wit
 - React Router DOM 6
 - Axios for API communication
 - HeroIcons for UI elements
+
+
+## Consent Flow
+**User Sends Consent**
+![Consent Sending Demo](../docs/consent.gif)
+- A 10-minute OTP consent link is sent to the patient with the consent form.
+- Upon patient acceptance, the system UI instantly redirects to the patient creation screen, capturing the patient's name.
+
+**Mobile Consent Received by Patient for Remote Acceptance**
+<img src="../docs/mobile.gif" height="700">
+
+- Patients can remotely accept or decline consent requests within 10-minute (e.g. via a mobile device)
+
 
 ## Getting Started
 
