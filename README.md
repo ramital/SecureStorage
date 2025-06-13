@@ -116,11 +116,13 @@ This solution directly supports federal goals in:
 
 **📋 Metrics:**
 
-- 100% Encrypted PHI (at rest & in transit)
-- 99% Uptime during test cycles
-- 50% Risk Reduction from access violations
-- Scalable to Enterprise-Grade PHI handling
+- 100% Encrypted PHI (at rest & in transit) (by design; validated in test environment)
 
+- ~99% Uptime during test cycles (estimated from controlled testing)
+
+- ~50% Risk Reduction from access violations (projected based on security architecture)
+
+- Scalable to Enterprise-Grade PHI handling (designed for future enterprise workloads; scalability projections based on architecture)
 
 
 
@@ -136,4 +138,4 @@ MIT. LICENSE.
 
 ## About the Author
 
-Developed by Ahmad Rami El Tal, this solution tackles healthcare data breaches with scalable PHI security. As a HIMSS Digital Member (since 2025), I’m refining it with the goal of presenting it at HIMSS26.
+Developed and maintained by Ahmad Rami El Tal, HIMSS Digital Member (2025).
