@@ -201,7 +201,7 @@ Dynamic roles (admin, doctor, nurse, ...) gets access only to relevant PHI categ
 ![Key Vault Secrets](./keys.png)
 
 ## 🔹 Azure Confidential Ledger
-![Key Vault Secrets](./ledger.png)
+![Key Vault Secrets](./Ledger.png)
 
 
 ## 🔹 Keycloak (OIDC Provider)
